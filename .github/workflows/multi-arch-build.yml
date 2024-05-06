@@ -10,12 +10,17 @@ on:
       - '!v2020*'
     paths:
       - 'packages/shared-state-async/**'
-      
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
 jobs:
   build:
     name: build ${{ matrix.arch }} ${{ github.ref }}
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
+      max-parallel: 1
       matrix:
         arch:
           - aarch64_cortex-a53
@@ -51,16 +56,20 @@ jobs:
           - x86_64
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Build packages ${{ matrix.arch }}
-        uses: openwrt/gh-action-sdk@v5
+        uses: openwrt/gh-action-sdk@v7
         env:
           ARCH: "${{ matrix.arch }}"
           FEEDNAME: "libremesh"
           IGNORE_ERRORS: "n m y"
           KEY_BUILD: "${{ secrets.KEY_BUILD }}"
           PACKAGES: "shared-state-bat_hosts"
+          INDEX: 1
+          NO_DEFAULT_FEEDS: 1
+          NO_REFRESH_CHECK: 1
+          NO_SHFMT_CHECK: 1
 
       - name: Set package destination
         run: |
@@ -74,5 +83,5 @@ jobs:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           external_repository: libremesh/lime-feed
           publish_dir: bin/packages/${{ matrix.arch }}/libremesh/
-          destination_dir: ${{ env.DEST_DIR }}/packages/${{ matrix.arch }}
+          destination_dir: arch_packages/${{ env.DEST_DIR }}/${{ matrix.arch }}
 

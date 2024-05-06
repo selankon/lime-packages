@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Shared State Async
+# Copyright (c) 2024 Javier Jorge <jjorge@inti.gob.ar>
+# Copyright (c) 2024 Instituto Nacional de Tecnologia Industrial
+# Copyright (C) 2024 Asociacion Civil Altermundi <info@altermundi.net>
+# SPDX-License-Identifier: AGPL-3.0-only
+
+
+sinc_args=""
+ 
+case "$1" in 
+    list) 
+        echo '{ "sync": { "data_type": "str", "peers_ip": "str" }, "get": { "data_type": "str" } }'
+    ;; 
+    call)
+        # source jshn shell library
+        . /usr/share/libubox/jshn.sh
+        read msg
+        json_load $msg
+        json_get_vars data_type 
+        json_get_vars peers_ip
+        case "$2" in 
+            get) 
+                if output=$(shared-state-async get $data_type 2>/dev/null) 
+                then 
+                    echo {\"data\": $output , \"error\" :$?}
+                else 
+                    echo {\"data\": {} , \"error\": $? } 
+                fi 
+            ;; 
+            sync) 
+                shared-state-async sync $data_type ${peers_ip//,/ } > /dev/null 2>&1
+                echo {\"data\": {} , \"error\": $? } 
+            ;; 
+            *)
+                 echo '{\"data\" {} ,\"error\" = "Method not found"}' 
+            ;; 
+        esac 
+    ;; 
+esac 
