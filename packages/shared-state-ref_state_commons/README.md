@@ -4,6 +4,18 @@ Shared-state has modules with information about the node, each
 information data type like wifi_links_info may have a reference type called
 wifi_links_info_ref.
 
+
+**TOC**
+- [Reference State](#reference-state)
+  - [Possible use cases](#possible-use-cases)
+  - [Usage](#usage)
+    - [Get](#get)
+    - [Insert](#insert)
+    - [Delete](#delete)
+  - [Default initialization](#default-initialization)
+  - [Available datatypes](#available-datatypes)
+
+
 Reference state is designed to contain information about the node that will
 persist and that is not changed to often. This is because it is stored in the
 device persistent memory and to many consequent write operations may damage the persistent memory. 
@@ -43,6 +55,7 @@ the network and define the "perfect" status, because this information may be use
 to detect deviations from the perfect status and easily identify and fix the
 problem. 
 
+### Get
 You can get the information about the wifi links using this command 
 
 ```bash
@@ -65,6 +78,7 @@ If this information about cheche or part of it is relevant you may want to use
 it as the reference state. This will stablish a "permanent" or "stable" 
 wifi_links_info called wifi_links_info_ref
 
+### Insert
 
 To insert a reference state just put the json part related to this node into
 shared state async.
@@ -89,6 +103,10 @@ or using the rpcd ubus wraper
 ```JSON
 {"data":{"cheche":{"src_loc":{"long":"-64.4228178","lat":"-31.8019512"},"links":{"ae40411f73a8c64a00fc3abe":{"freq":2462,"iface":"wlan0-mesh","tx_rate":144,"dst_mac":"c6:4a:00:fc:3a:be","channel":11,"chains":[-40,-35],"signal":-34,"rx_rate":144400,"src_mac":"ae:40:41:1f:73:a8"}}},"graciela":[]},"error":0}
 ```
+### Delete
+
+echo '{"cheche": []}' | shared-state-async insert wifi_links_info_ref
+
 ## Default initialization 
 Files are in default state as an empty json object... "{}" 
 Ubus call to get method will return empty array "[]". That is a limitation of the
@@ -99,5 +117,8 @@ ubus -S call shared-state-async get  '{"data_type":  "wifi_links_info_ref" }'
 {"data":{"cheche":[],"graciela":[],"tito":[]},"error":0}
 ```
 ## Available datatypes
-Data types must be declared. Available datatypes are babel_links_info_ref,
-bat_links_info_ref, wifi_links_info_ref and node_info_ref
+Data types must be declared. Available datatypes are 
+- babel_links_info_ref,
+- bat_links_info_ref, 
+- wifi_links_info_ref and 
+- node_info_ref

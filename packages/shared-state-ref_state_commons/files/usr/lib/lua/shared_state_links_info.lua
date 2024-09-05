@@ -15,7 +15,7 @@ function shared_state_links_info.add_dst_loc(links_info, shared_state_sample, ho
     if shared_state_sample ~= nil then
         for link, l_data in pairs(links_info.links) do
             for node, data in pairs(shared_state_sample) do
-                if node ~= hostname and data.links ~= nil then
+                if node ~= hostname and type(data) == "table" and data.links ~= nil then
                     local link_data = data.links[link]
                     if link_data ~= nil and data.src_loc~= nil then
                         l_data.dst_loc = {}
